@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AccentAura – English Accent Identifier</title>
+  <!-- Clean Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Minimal Header Navigation -->
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="#home" class="brand" data-nav="home">
+        <span class="brand-logo">🎙️</span>
+        <div class="brand-text">
+          <span class="brand-name">AccentAura</span>
+          <span class="brand-tag">English Accent Identifier</span>
+        </div>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#home" class="nav-item active" data-nav="home">Home</a>
+        <a href="#detect" class="nav-item" data-nav="detect">Identify Accent</a>
+        <a href="#explore" class="nav-item" data-nav="explore">Explore Accents</a>
+        <a href="#about" class="nav-item" data-nav="about">About</a>
+      </nav>
+
+      <div class="header-action">
+        <a href="#detect" class="btn-header-cta" data-nav="detect">Start Speaking</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main">
+
+    <!-- ====================================================
+         1. HOME SECTION
+         ==================================================== -->
+    <section id="sec-home" class="app-section active">
+      <div class="hero-container">
+        <div class="hero-badge">Department of English Language & Literature</div>
+        <h1 class="hero-title">Discover the World<br>in Your Voice</h1>
+        <p class="hero-subtitle">
+          AccentAura listens to your spoken English and predicts which global accent variety you most closely match. Powered by traditional acoustic signal processing and genuine speech models.
+        </p>
+
+        <div class="hero-actions">
+          <button class="btn btn-primary-cta" data-nav="detect">
+            <span class="btn-icon">🎙️</span> Start Speaking
+          </button>
+          <button class="btn btn-secondary-cta" data-nav="explore">
+            Explore 7 Accents →
+          </button>
+        </div>
+
+        <!-- Subtle Ambient Waveform Visualizer -->
+        <div class="hero-visualizer-box">
+          <canvas id="ambient-canvas" height="90"></canvas>
+          <div class="visualizer-hint">Pure Acoustic Analysis • No Generative AI • Instant Results</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================
+         2. ACCENT DETECTION & RESULTS SECTION
+         ==================================================== -->
+    <section id="sec-detect" class="app-section">
+      <div class="section-container">
+        
+        <!-- Recording View Stage -->
+        <div id="detection-stage" class="stage-view active">
+          <div class="stage-header">
+            <h2 class="section-heading">Voice Recording Studio</h2>
+            <p class="section-lead">Read the standard phonetic passage below into your microphone for 10–25 seconds.</p>
+          </div>
+
+          <div class="studio-card">
+            <!-- Standard Phonetic Reading Prompt -->
+            <div class="prompt-box">
+              <div class="prompt-header">
+                <span class="prompt-tag">Phonetic Reading Passage</span>
+                <span class="prompt-time">10 – 25 Seconds Recommended</span>
+              </div>
+              <p class="prompt-content">
+                “Please call Stella. Ask her to bring these things with her from the store: Six spoons of fresh snow peas, five thick slabs of blue cheese, and maybe a snack for her brother Bob. We also need a small plastic snake and a big toy frog for the kids. She can scoop these things into three red bags, and we will go meet her Wednesday at the train station.”
+              </p>
+            </div>
+
+            <!-- Oscilloscope Waveform Display -->
+            <div class="waveform-box">
+              <canvas id="live-canvas" height="130"></canvas>
+              <div class="waveform-overlay">
+                <span id="recording-status" class="status-indicator idle">Ready</span>
+                <span id="recording-timer" class="timer-display">00:00</span>
+              </div>
+            </div>
+
+            <!-- Recording Controls -->
+            <div class="controls-toolbar">
+              <button class="btn btn-record" id="btn-record">
+                <span class="btn-dot"></span> <span id="record-label">Start Recording</span>
+              </button>
+              <button class="btn btn-control" id="btn-stop" disabled>
+                ⏹ Stop
+              </button>
+              <button class="btn btn-control" id="btn-playback" disabled>
+                ▶ Listen
+              </button>
+              <button class="btn btn-control" id="btn-rerecord" disabled>
+                🔄 Record Again
+              </button>
+            </div>
+
+            <!-- Analyze Trigger -->
+            <button class="btn btn-analyze" id="btn-analyze" disabled>
+              Analyze Accent
+            </button>
+          </div>
+        </div>
+
+        <!-- Analyzing Loader State -->
+        <div id="loading-stage" class="stage-view text-center">
+          <div class="loader-spinner"></div>
+          <h3 class="loader-title">Analyzing Acoustic Signal</h3>
+          <p class="loader-text">Extracting 188 spectral, cepstral, and formant features...</p>
+        </div>
+
+        <!-- Results Stage View -->
+        <div id="results-stage" class="stage-view">
+          <div class="stage-header text-center">
+            <h2 class="section-heading">Accent Identification Result</h2>
+            <p class="section-lead">Statistical match computed from your acoustic voice characteristics.</p>
+          </div>
+
+          <div class="results-card">
+            <!-- Primary Detected Accent -->
+            <div class="primary-result">
+              <div class="result-header">
+                <span class="result-flag" id="res-flag">🌐</span>
+                <div class="result-titles">
+                  <h3 class="result-accent-name" id="res-name">Predicted Accent</h3>
+                  <div class="result-variant" id="res-variant">Dialect Family</div>
+                </div>
+                <div class="result-score-badge">
+                  <span class="score-number" id="res-score">0%</span>
+                  <span class="score-label">Confidence</span>
+                </div>
+              </div>
+
+              <!-- Main Progress Bar -->
+              <div class="meter-track">
+                <div class="meter-fill" id="res-meter"></div>
+              </div>
+
+              <!-- Explanation Text -->
+              <p class="result-description" id="res-desc">
+                Phonological summary of detected dialect characteristics...
+              </p>
+            </div>
+
+            <!-- Top 3 Categories -->
+            <div class="top-candidates-section">
+              <h4 class="candidates-heading">Top Three Predicted Categories</h4>
+              <div class="candidates-grid" id="res-candidates">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Quality & Timestamp Summary -->
+            <div class="result-meta-row">
+              <div class="meta-item">
+                <span class="meta-label">Speech Duration</span>
+                <span class="meta-val" id="res-duration">0.0s</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Signal Quality</span>
+                <span class="meta-val" id="res-quality">Good</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Analysis Time</span>
+                <span class="meta-val" id="res-time">--:--:--</span>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="results-actions">
+              <button class="btn btn-primary-cta" id="btn-try-again">
+                🔄 Try Again
+              </button>
+              <button class="btn btn-secondary-cta" data-nav="explore">
+                Explore All 7 Accents →
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================
+         3. EXPLORE ACCENTS SECTION
+         ==================================================== -->
+    <section id="sec-explore" class="app-section">
+      <div class="section-container">
+        <div class="stage-header">
+          <h2 class="section-heading">Explore World Englishes</h2>
+          <p class="section-lead">Acoustic, geographical, and lexical profiles for the 7 supported accent varieties.</p>
+        </div>
+
+        <div class="accents-grid" id="explore-accents-container">
+          <!-- Dynamically populated by app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================
+         4. ABOUT SECTION
+         ==================================================== -->
+    <section id="sec-about" class="app-section">
+      <div class="section-container">
+        <div class="stage-header">
+          <h2 class="section-heading">About AccentAura</h2>
+          <p class="section-lead">Acoustic machine learning system developed for university educational exhibitions.</p>
+        </div>
+
+        <div class="about-grid">
+          <div class="about-card">
+            <h3 class="about-title">Project Purpose</h3>
+            <p class="about-body">
+              AccentAura was designed for the University English Language and Literature Department exhibition to demonstrate phonological diversity and acoustic ear training. Visitors can speak into the terminal and scientifically observe how regional phonetic markers shape spoken English.
+            </p>
+          </div>
+
+          <div class="about-card">
+            <h3 class="about-title">Acoustic Technologies</h3>
+            <p class="about-body">
+              Built using traditional audio signal processing and machine learning:
+            </p>
+            <ul class="about-list">
+              <li><strong>Feature Extraction:</strong> 188 dimensions incorporating 20 MFCCs, Delta dynamics, spectral roll-off, spectral contrast, and chroma STFT.</li>
+              <li><strong>Machine Learning:</strong> Supervised classification evaluated via Stratified Group K-Fold cross-validation split by speaker.</li>
+              <li><strong>Zero Generative AI:</strong> Operates entirely on raw sound waveforms without speech-to-text transcription or cloud AI models.</li>
+            </ul>
+          </div>
+
+          <div class="about-card">
+            <h3 class="about-title">Dataset Provenance</h3>
+            <p class="about-body">
+              Training models were prepared with real human recordings from the <strong>Speech Accent Archive</strong> (George Mason University), made available under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" class="link-cyan">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 (CC-BY-NC-SA 4.0)</a> license.
+            </p>
+          </div>
+
+          <div class="about-card">
+            <h3 class="about-title">Visitor Privacy</h3>
+            <p class="about-body">
+              All microphone recordings are processed locally for acoustic analysis. Recordings are temporary and automatically cleared when a session resets, ensuring full visitor privacy.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Minimal Footer -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <span>AccentAura • English Language & Literature Exhibition</span>
+      <span class="footer-dot">•</span>
+      <span>Traditional Machine Learning & Signal Processing</span>
+    </div>
+  </footer>
+
+  <!-- Audio playback element -->
+  <audio id="global-audio-player" class="d-none"></audio>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
