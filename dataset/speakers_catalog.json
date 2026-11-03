@@ -1,0 +1,64 @@
+{
+  "American": [
+    "english1",
+    "english5",
+    "english6",
+    "english7",
+    "english9",
+    "english10",
+    "english15",
+    "english16"
+  ],
+  "British": [
+    "english2",
+    "english11",
+    "english12",
+    "english13",
+    "english35",
+    "english38",
+    "english40",
+    "english57"
+  ],
+  "Australian": [
+    "english3",
+    "english8",
+    "english69",
+    "english73",
+    "english77",
+    "english84",
+    "english87",
+    "english125"
+  ],
+  "Irish": [
+    "english14",
+    "english56",
+    "english72",
+    "english85",
+    "english108",
+    "english134"
+  ],
+  "Scottish": [
+    "english24",
+    "english80"
+  ],
+  "Pakistani": [
+    "urdu1",
+    "urdu2",
+    "urdu3",
+    "urdu5",
+    "urdu7",
+    "urdu10",
+    "urdu11",
+    "urdu12"
+  ],
+  "Indian": [
+    "hindi1",
+    "hindi2",
+    "hindi3",
+    "hindi4",
+    "hindi5",
+    "hindi6",
+    "hindi7",
+    "hindi8"
+  ]
+}

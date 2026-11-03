@@ -1,0 +1,2 @@
+/api/*  https://classroom-cafe-fought-values.trycloudflare.com/api/:splat  200!
+/*      /index.html                                                         200
