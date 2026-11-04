@@ -61,6 +61,11 @@ class AccentAuraApp {
     this.initCanvasScaling();
     this.startAmbientWave();
     this.loadExploreAccents();
+    if (window.AccentPipeline) {
+      setTimeout(() => {
+        window.AccentPipeline.init().catch(() => {});
+      }, 1500);
+    }
 
     // Default route from hash
     const initialHash = window.location.hash.replace("#", "") || "home";
@@ -278,6 +283,10 @@ class AccentAuraApp {
       this.mediaStream = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
       });
+
+      if (window.AccentPipeline) {
+        window.AccentPipeline.init().catch(() => {});
+      }
 
       this.analyser = this.audioCtx.createAnalyser();
       this.analyser.fftSize = 2048;
@@ -575,27 +584,12 @@ class AccentAuraApp {
 
     this.showDetectionStage("loading");
 
-    let uploadBlob = this.recordedBlob;
-    let filename = "voice_input.webm";
     try {
-      uploadBlob = await this.convertBlobToWav(this.recordedBlob);
-      if (uploadBlob.type === "audio/wav") {
-        filename = "voice_input.wav";
+      if (!window.AccentPipeline) {
+        throw new Error("Analysis engine is unavailable in this browser.");
       }
-    } catch (e) {
-      console.warn("Using fallback blob:", e);
-    }
 
-    const formData = new FormData();
-    formData.append("audio", uploadBlob, filename);
-
-    try {
-      const res = await fetch("/api/predict-accent", {
-        method: "POST",
-        body: formData
-      });
-
-      const data = await res.json();
+      const data = await window.AccentPipeline.predictFromBlob(this.recordedBlob);
 
       if (!data.success) {
         alert(data.error || "Unable to analyze audio. Please record at least 10–20 seconds of speech.");
@@ -607,8 +601,8 @@ class AccentAuraApp {
       this.showDetectionStage("results");
 
     } catch (err) {
-      console.error("Analysis API error:", err);
-      alert("Communication error with the prediction service.");
+      console.error("Analysis error:", err);
+      alert("Unable to analyze the recording in this browser. Please try again.");
       this.showDetectionStage("detection");
     }
   }
@@ -650,8 +644,8 @@ class AccentAuraApp {
     if (!container) return;
 
     try {
-      const res = await fetch("/api/accents");
-      const data = await res.json();
+      if (!window.AccentPipeline) return;
+      const data = await window.AccentPipeline.loadAccents();
       if (!data.success) return;
 
       const accents = data.accents;
@@ -712,7 +706,7 @@ class AccentAuraApp {
     btnElement.classList.add("playing");
     btnElement.textContent = "⏹ Stop Playback";
 
-    this.globalAudio.src = `/api/sample-audio/${sampleId}`;
+    this.globalAudio.src = `dataset/raw_audio/${sampleId}.mp3`;
     this.globalAudio.play().catch(e => console.warn("Audio playback notice:", e));
 
     this.globalAudio.onended = () => {

@@ -1,8 +1,0 @@
-services:
-  - type: web
-    name: accentaura-identifier
-    env: docker
-    plan: free
-    region: oregon
-    autoDeploy: true
-    healthCheckPath: /api/health
